@@ -1,2 +1,3 @@
+include ':SpWebView'
 include ':app'
 rootProject.name = "SpWebView"
