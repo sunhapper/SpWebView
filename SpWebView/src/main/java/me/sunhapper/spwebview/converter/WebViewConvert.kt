@@ -1,7 +1,12 @@
 package me.sunhapper.spwebview.converter
 
+import android.net.Uri
+import android.os.Build
+import android.webkit.SslErrorHandler
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import androidx.annotation.RequiresApi
 
 /**
  * Created by sunhapper on 2021/3/19 .
@@ -38,8 +43,25 @@ fun WebResourceRequest?.toX5(): com.tencent.smtt.export.external.interfaces.WebR
     }
 }
 
-fun com.tencent.smtt.export.external.interfaces.WebResourceRequest?.toX5(): WebResourceRequest? {
+fun com.tencent.smtt.export.external.interfaces.WebResourceRequest?.toSystem(): WebResourceRequest? {
     return this?.let {
-        SystemResourceRequest(it)
+        object :WebResourceRequest{
+            override fun getUrl(): Uri = it.url
+            override fun isForMainFrame(): Boolean = it.isForMainFrame
+            override fun isRedirect(): Boolean = it.isRedirect
+            override fun hasGesture(): Boolean = it.hasGesture()
+            override fun getMethod(): String = it.method
+            override fun getRequestHeaders(): Map<String, String> = it.requestHeaders
+
+        }
+    }
+}
+@RequiresApi(Build.VERSION_CODES.M)
+fun WebResourceError?.toX5():com.tencent.smtt.export.external.interfaces.WebResourceError?{
+    return this?.let {
+        object : com.tencent.smtt.export.external.interfaces.WebResourceError() {
+            override fun getDescription(): CharSequence = it.description
+            override fun getErrorCode(): Int = it.errorCode
+        }
     }
 }
