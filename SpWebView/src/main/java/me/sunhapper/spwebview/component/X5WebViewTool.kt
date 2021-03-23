@@ -1,16 +1,10 @@
 package me.sunhapper.spwebview.component
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.os.Build
-import android.os.Message
-import android.view.KeyEvent
 import androidx.annotation.RequiresApi
 import com.tencent.smtt.export.external.interfaces.*
-import com.tencent.smtt.sdk.WebView
-import com.tencent.smtt.sdk.WebViewClient
-import me.sunhapper.spwebview.converter.WebViewClientComponent
 import java.io.InputStream
 import java.security.Principal
 import java.security.PrivateKey

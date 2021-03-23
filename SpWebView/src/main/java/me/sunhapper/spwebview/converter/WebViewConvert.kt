@@ -2,7 +2,6 @@ package me.sunhapper.spwebview.converter
 
 import android.net.Uri
 import android.os.Build
-import android.webkit.SslErrorHandler
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
