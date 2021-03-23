@@ -6,7 +6,6 @@ import android.os.Build
 import android.os.Message
 import android.view.KeyEvent
 import android.webkit.*
-import androidx.annotation.RequiresApi
 import me.sunhapper.spwebview.component.WebViewClientComponent
 import me.sunhapper.spwebview.component.toComponent
 import me.sunhapper.spwebview.component.toSystem
@@ -254,16 +253,26 @@ class SystemWebViewClientProxy(
     }
 
     override fun onTooManyRedirects(view: WebView, cancelMsg: Message?, continueMsg: Message?) {
-        webViewClient?.onTooManyRedirects(view, cancelMsg, continueMsg)
+        if (webViewClient != null) {
+            webViewClient.onTooManyRedirects(view, cancelMsg, continueMsg)
+        } else {
+            super.onTooManyRedirects(view, cancelMsg, continueMsg)
+        }
     }
 
     override fun onFormResubmission(view: WebView, dontResend: Message?, resend: Message?) {
-        webViewClient?.onFormResubmission(view, dontResend, resend)
+        if (webViewClient != null) {
+            webViewClient.onFormResubmission(view, dontResend, resend)
+        } else {
+            super.onFormResubmission(view, dontResend, resend)
+        }
     }
 
     override fun onLoadResource(view: WebView, url: String?) {
-        webViewClient?.onLoadResource(view, url)
+        if (webViewClient != null) {
+            webViewClient.onLoadResource(view, url)
+        } else {
+            super.onLoadResource(view, url)
+        }
     }
-
-
 }
