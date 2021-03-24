@@ -1,5 +1,6 @@
 package me.sunhapper.spwebview.component
 
+import android.content.Intent
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.net.http.SslError
@@ -214,6 +215,50 @@ fun GeolocationPermissions.Callback?.toComponent(): GeolocationPermissionsCallba
         object : GeolocationPermissionsCallbackComponent {
             override fun invoke(origin: String?, allow: Boolean, retain: Boolean) =
                 it.invoke(origin, allow, retain)
+        }
+    }
+}
+
+fun ConsoleMessage?.toComponent(): ConsoleMessageComponent? {
+    return this?.let {
+        object : ConsoleMessageComponent {
+            override fun messageLevel(): String? = it.messageLevel().name
+            override fun message(): String? = it.message()
+            override fun sourceId(): String? = it.sourceId()
+            override fun lineNumber(): Int = it.lineNumber()
+        }
+    }
+}
+
+fun PermissionRequest?.toComponent(): PermissionRequestComponent? {
+    return this?.let {
+        object : PermissionRequestComponent {
+            override fun getOrigin(): Uri? = it.origin
+            override fun getResources(): Array<String>? = it.resources
+            override fun grant(resources: Array<String>?) = it.grant(resources)
+            override fun deny() = it.deny()
+        }
+    }
+
+}
+
+fun <T> ValueCallback<T>?.toComponent(): ValueCallbackComponent<T>? {
+    return this?.let {
+        object : ValueCallbackComponent<T> {
+            override fun onReceiveValue(value: T) = it.onReceiveValue(value)
+        }
+    }
+}
+
+fun WebChromeClient.FileChooserParams?.toComponent(): FileChooserParamsComponent? {
+    return this?.let {
+        object : FileChooserParamsComponent {
+            override fun getMode(): Int = it.mode
+            override fun getAcceptTypes(): Array<String>? = it.acceptTypes
+            override fun isCaptureEnabled(): Boolean = it.isCaptureEnabled
+            override fun getTitle(): CharSequence? = it.title
+            override fun getFilenameHint(): String? = it.filenameHint
+            override fun createIntent(): Intent? = it.createIntent()
         }
     }
 }

@@ -1,10 +1,13 @@
 package me.sunhapper.spwebview.component
 
+import android.content.Intent
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.tencent.smtt.export.external.interfaces.*
+import com.tencent.smtt.sdk.ValueCallback
+import com.tencent.smtt.sdk.WebChromeClient
 import java.io.InputStream
 import java.security.Principal
 import java.security.PrivateKey
@@ -134,15 +137,15 @@ fun HttpAuthHandler?.toComponent(): HttpAuthHandlerComponent? {
 fun SslError?.toComponent(): SslErrorComponent? {
     return this?.let {
         object : SslErrorComponent {
-            override fun getCertificate(): SslCertificate? =it.certificate
+            override fun getCertificate(): SslCertificate? = it.certificate
 
-            override fun getUrl(): String =""
+            override fun getUrl(): String = ""
 
-            override fun addError(error: Int): Boolean=it.addError(error)
+            override fun addError(error: Int): Boolean = it.addError(error)
 
-            override fun hasError(error: Int): Boolean =it.hasError(error)
+            override fun hasError(error: Int): Boolean = it.hasError(error)
 
-            override fun getPrimaryError(): Int =it.primaryError
+            override fun getPrimaryError(): Int = it.primaryError
 
             override fun toString(): String {
                 return "primary error: " + getPrimaryError() +
@@ -150,6 +153,72 @@ fun SslError?.toComponent(): SslErrorComponent? {
                         " on URL: " + getUrl()
             }
 
+        }
+    }
+}
+
+fun JsResult?.toComponent(): JsResultComponent? {
+    return this?.let {
+        object : JsResultComponent {
+            override fun cancel() = it.cancel()
+            override fun confirm() = it.confirm()
+        }
+    }
+}
+
+fun JsPromptResult?.toComponent(): JsPromptResultComponent? {
+    return this?.let {
+        object : JsPromptResultComponent {
+            override fun confirm(result: String?) = it.confirm(result)
+        }
+    }
+}
+
+fun IX5WebChromeClient.CustomViewCallback?.toComponent(): CustomViewCallbackComponent? {
+    return this?.let {
+        object : CustomViewCallbackComponent {
+            override fun onCustomViewHidden() = it.onCustomViewHidden()
+        }
+    }
+}
+
+fun GeolocationPermissionsCallback?.toComponent(): GeolocationPermissionsCallbackComponent? {
+    return this?.let {
+        object : GeolocationPermissionsCallbackComponent {
+            override fun invoke(origin: String?, allow: Boolean, retain: Boolean) =
+                it.invoke(origin, allow, retain)
+        }
+    }
+}
+
+fun ConsoleMessage?.toComponent(): ConsoleMessageComponent? {
+    return this?.let {
+        object : ConsoleMessageComponent {
+            override fun messageLevel(): String? = it.messageLevel().name
+            override fun message(): String? = it.message()
+            override fun sourceId(): String? = it.sourceId()
+            override fun lineNumber(): Int = it.lineNumber()
+        }
+    }
+}
+
+fun <T> ValueCallback<T>?.toComponent(): ValueCallbackComponent<T>? {
+    return this?.let {
+        object : ValueCallbackComponent<T> {
+            override fun onReceiveValue(value: T) = it.onReceiveValue(value)
+        }
+    }
+}
+
+fun WebChromeClient.FileChooserParams?.toComponent(): FileChooserParamsComponent? {
+    return this?.let {
+        object : FileChooserParamsComponent {
+            override fun getMode(): Int = it.mode
+            override fun getAcceptTypes(): Array<String>? = it.acceptTypes
+            override fun isCaptureEnabled(): Boolean = it.isCaptureEnabled
+            override fun getTitle(): CharSequence? = it.title
+            override fun getFilenameHint(): String? = it.filenameHint
+            override fun createIntent(): Intent? = it.createIntent()
         }
     }
 }

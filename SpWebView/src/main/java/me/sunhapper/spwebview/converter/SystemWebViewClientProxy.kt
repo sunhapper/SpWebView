@@ -43,11 +43,7 @@ class SystemWebViewClientProxy(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && webViewClient != null) {
             webViewClient.onReceivedError(view, request, error)
         } else {
-            super.onReceivedError(
-                view,
-                request,
-                error
-            )
+            super.onReceivedError(view, request, error)
         }
     }
 
@@ -87,15 +83,11 @@ class SystemWebViewClientProxy(
     override fun shouldInterceptRequest(view: WebView, url: String?): WebResourceResponse? {
         return if (spWebViewConfig.needSpInterceptRequest) {
             webViewClientComponent.shouldInterceptRequest(view, url).toSystem()
-                ?: webViewClient?.shouldInterceptRequest(view, url) ?: super.shouldInterceptRequest(
-                    view,
-                    url
-                )
+                ?: webViewClient?.shouldInterceptRequest(view, url)
+                ?: super.shouldInterceptRequest(view, url)
         } else {
-            webViewClient?.shouldInterceptRequest(view, url) ?: super.shouldInterceptRequest(
-                view,
-                url
-            )
+            webViewClient?.shouldInterceptRequest(view, url)
+                ?: super.shouldInterceptRequest(view, url)
         }
     }
 
@@ -104,8 +96,7 @@ class SystemWebViewClientProxy(
         request: WebResourceRequest?
     ): WebResourceResponse? {
         return if (spWebViewConfig.needSpInterceptRequest) {
-            webViewClientComponent.shouldInterceptRequest(view, request.toComponent())
-                .toSystem()
+            webViewClientComponent.shouldInterceptRequest(view, request.toComponent()).toSystem()
                 ?: webViewClient?.shouldInterceptRequest(view, request)
                 ?: super.shouldInterceptRequest(view, request)
         } else {
@@ -115,10 +106,8 @@ class SystemWebViewClientProxy(
     }
 
     override fun shouldOverrideKeyEvent(view: WebView, event: KeyEvent?): Boolean {
-        return webViewClient?.shouldOverrideKeyEvent(view, event) ?: super.shouldOverrideKeyEvent(
-            view,
-            event
-        )
+        return webViewClient?.shouldOverrideKeyEvent(view, event)
+            ?: super.shouldOverrideKeyEvent(view, event)
     }
 
     override fun onSafeBrowsingHit(
@@ -146,10 +135,7 @@ class SystemWebViewClientProxy(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && webViewClient != null) {
             webViewClient.onRenderProcessGone(view, detail)
         } else {
-            super.onRenderProcessGone(
-                view,
-                detail
-            )
+            super.onRenderProcessGone(view, detail)
         }
     }
 
@@ -185,15 +171,11 @@ class SystemWebViewClientProxy(
 
     override fun shouldOverrideUrlLoading(view: WebView, url: String?): Boolean {
         return if (spWebViewConfig.needSpOverrideUrl
-            && webViewClientComponent.shouldOverrideUrlLoading(view, url)
-        ) {
+            && webViewClientComponent.shouldOverrideUrlLoading(view, url)) {
             true
         } else {
             webViewClient?.shouldOverrideUrlLoading(view, url)
-                ?: super.shouldOverrideUrlLoading(
-                    view,
-                    url
-                )
+                ?: super.shouldOverrideUrlLoading(view, url)
         }
     }
 
@@ -206,10 +188,7 @@ class SystemWebViewClientProxy(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && webViewClient != null) {
                 webViewClient.shouldOverrideUrlLoading(view, request)
             } else {
-                super.shouldOverrideUrlLoading(
-                    view,
-                    request
-                )
+                super.shouldOverrideUrlLoading(view, request)
             }
         }
     }

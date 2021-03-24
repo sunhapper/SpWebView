@@ -11,8 +11,10 @@ public class SpWebViewConfig {
     var needSpOverrideUrl = true
     var needSpInterceptRequest = true
     var needSpToast = true
+    var needSpPrompt = true
     var needSpDialog = true
     var needSpErrorPage = true
     var needSpShowCustomView = true
     var needSpFileChoose = true
+    var needPermissionDialog = true
 }
