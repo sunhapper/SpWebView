@@ -1,22 +1,20 @@
-package me.sunhapper.spwebview.converter
+package me.sunhapper.spwebview.scaffold
 
 import android.graphics.Bitmap
+import android.net.http.SslError
 import android.os.Build
-import android.os.Bundle
 import android.os.Message
 import android.view.KeyEvent
-import com.tencent.smtt.export.external.interfaces.*
-import com.tencent.smtt.sdk.WebView
-import com.tencent.smtt.sdk.WebViewClient
+import android.webkit.*
 import me.sunhapper.spwebview.component.WebViewClientComponent
 import me.sunhapper.spwebview.component.toComponent
-import me.sunhapper.spwebview.component.toX5
+import me.sunhapper.spwebview.component.toSystem
 import me.sunhapper.spwebview.config.SpWebViewConfig
 
 /**
  * Created by sunhapper on 2021/3/17 .
  */
-class TencentWebViewClientProxy(
+class SystemWebViewClientProxy(
     private val webViewClientComponent: WebViewClientComponent<WebView>,
     private val webViewClient: WebViewClient?,
     private val spWebViewConfig: SpWebViewConfig
@@ -45,11 +43,7 @@ class TencentWebViewClientProxy(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && webViewClient != null) {
             webViewClient.onReceivedError(view, request, error)
         } else {
-            super.onReceivedError(
-                view,
-                request,
-                error
-            )
+            super.onReceivedError(view, request, error)
         }
     }
 
@@ -88,16 +82,12 @@ class TencentWebViewClientProxy(
 
     override fun shouldInterceptRequest(view: WebView, url: String?): WebResourceResponse? {
         return if (spWebViewConfig.needSpInterceptRequest) {
-            webViewClientComponent.shouldInterceptRequest(view, url).toX5()
-                ?: webViewClient?.shouldInterceptRequest(view, url) ?: super.shouldInterceptRequest(
-                    view,
-                    url
-                )
+            webViewClientComponent.shouldInterceptRequest(view, url).toSystem()
+                ?: webViewClient?.shouldInterceptRequest(view, url)
+                ?: super.shouldInterceptRequest(view, url)
         } else {
-            webViewClient?.shouldInterceptRequest(view, url) ?: super.shouldInterceptRequest(
-                view,
-                url
-            )
+            webViewClient?.shouldInterceptRequest(view, url)
+                ?: super.shouldInterceptRequest(view, url)
         }
     }
 
@@ -106,7 +96,7 @@ class TencentWebViewClientProxy(
         request: WebResourceRequest?
     ): WebResourceResponse? {
         return if (spWebViewConfig.needSpInterceptRequest) {
-            webViewClientComponent.shouldInterceptRequest(view, request.toComponent()).toX5()
+            webViewClientComponent.shouldInterceptRequest(view, request.toComponent()).toSystem()
                 ?: webViewClient?.shouldInterceptRequest(view, request)
                 ?: super.shouldInterceptRequest(view, request)
         } else {
@@ -115,28 +105,23 @@ class TencentWebViewClientProxy(
         }
     }
 
-    override fun shouldInterceptRequest(
+    override fun shouldOverrideKeyEvent(view: WebView, event: KeyEvent?): Boolean {
+        return webViewClient?.shouldOverrideKeyEvent(view, event)
+            ?: super.shouldOverrideKeyEvent(view, event)
+    }
+
+    override fun onSafeBrowsingHit(
         view: WebView,
         request: WebResourceRequest?,
-        bundle: Bundle?
-    ): WebResourceResponse {
-        return if (spWebViewConfig.needSpInterceptRequest) {
-            webViewClientComponent.shouldInterceptRequest(view, request.toComponent()).toX5()
-                ?: webViewClient?.shouldInterceptRequest(view, request, bundle)
-                ?: super.shouldInterceptRequest(view, request, bundle)
+        threatType: Int,
+        callback: SafeBrowsingResponse?
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && webViewClient != null) {
+            webViewClient.onSafeBrowsingHit(view, request, threatType, callback)
         } else {
-            webViewClient?.shouldInterceptRequest(view, request, bundle)
-                ?: super.shouldInterceptRequest(view, request, bundle)
+            super.onSafeBrowsingHit(view, request, threatType, callback)
         }
     }
-
-    override fun shouldOverrideKeyEvent(view: WebView, event: KeyEvent?): Boolean {
-        return webViewClient?.shouldOverrideKeyEvent(view, event) ?: super.shouldOverrideKeyEvent(
-            view,
-            event
-        )
-    }
-
 
     override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
         if (webViewClient != null) {
@@ -146,6 +131,13 @@ class TencentWebViewClientProxy(
         }
     }
 
+    override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail?): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && webViewClient != null) {
+            webViewClient.onRenderProcessGone(view, detail)
+        } else {
+            super.onRenderProcessGone(view, detail)
+        }
+    }
 
     override fun onReceivedLoginRequest(
         view: WebView,
@@ -179,15 +171,11 @@ class TencentWebViewClientProxy(
 
     override fun shouldOverrideUrlLoading(view: WebView, url: String?): Boolean {
         return if (spWebViewConfig.needSpOverrideUrl
-            && webViewClientComponent.shouldOverrideUrlLoading(view, url)
-        ) {
+            && webViewClientComponent.shouldOverrideUrlLoading(view, url)) {
             true
         } else {
             webViewClient?.shouldOverrideUrlLoading(view, url)
-                ?: super.shouldOverrideUrlLoading(
-                    view,
-                    url
-                )
+                ?: super.shouldOverrideUrlLoading(view, url)
         }
     }
 
@@ -200,14 +188,18 @@ class TencentWebViewClientProxy(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && webViewClient != null) {
                 webViewClient.shouldOverrideUrlLoading(view, request)
             } else {
-                super.shouldOverrideUrlLoading(
-                    view,
-                    request
-                )
+                super.shouldOverrideUrlLoading(view, request)
             }
         }
     }
 
+    override fun onPageCommitVisible(view: WebView, url: String?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && webViewClient != null) {
+            webViewClient.onPageCommitVisible(view, url)
+        } else {
+            super.onPageCommitVisible(view, url)
+        }
+    }
 
     override fun onUnhandledKeyEvent(view: WebView, event: KeyEvent?) {
         if (webViewClient != null) {
@@ -260,15 +252,6 @@ class TencentWebViewClientProxy(
             webViewClient.onLoadResource(view, url)
         } else {
             super.onLoadResource(view, url)
-        }
-    }
-
-
-    override fun onDetectedBlankScreen(p0: String?, p1: Int) {
-        if (webViewClient != null) {
-            webViewClient.onDetectedBlankScreen(p0, p1)
-        } else {
-            super.onDetectedBlankScreen(p0, p1)
         }
     }
 }

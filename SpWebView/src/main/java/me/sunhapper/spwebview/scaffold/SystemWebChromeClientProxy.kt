@@ -1,11 +1,10 @@
-package me.sunhapper.spwebview.converter
+package me.sunhapper.spwebview.scaffold
 
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
 import android.view.View
-import com.tencent.smtt.export.external.interfaces.*
-import com.tencent.smtt.sdk.*
+import android.webkit.*
 import me.sunhapper.spwebview.component.WebChromeClientComponent
 import me.sunhapper.spwebview.component.toComponent
 import me.sunhapper.spwebview.config.SpWebViewConfig
@@ -13,7 +12,7 @@ import me.sunhapper.spwebview.config.SpWebViewConfig
 /**
  * Created by sunhapper on 2021/3/22 .
  */
-class TencentWebChromeClientProxy(
+class SystemWebChromeClientProxy(
     private val webChromeClientComponent: WebChromeClientComponent<WebView>,
     private val webChromeClient: WebChromeClient?,
     private val spWebViewConfig: SpWebViewConfig
@@ -61,7 +60,7 @@ class TencentWebChromeClientProxy(
         }
     }
 
-    override fun onShowCustomView(view: View?, callback: IX5WebChromeClient.CustomViewCallback?) {
+    override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
         if (spWebViewConfig.needSpShowCustomView) {
             webChromeClientComponent.onShowCustomView(view, callback.toComponent())
         }
@@ -78,7 +77,7 @@ class TencentWebChromeClientProxy(
     override fun onShowCustomView(
         view: View?,
         requestedOrientation: Int,
-        callback: IX5WebChromeClient.CustomViewCallback?
+        callback: CustomViewCallback?
     ) {
         if (spWebViewConfig.needSpShowCustomView) {
             webChromeClientComponent.onShowCustomView(
@@ -104,10 +103,9 @@ class TencentWebChromeClientProxy(
         }
     }
 
-
     override fun onGeolocationPermissionsShowPrompt(
         origin: String?,
-        callback: GeolocationPermissionsCallback?
+        callback: GeolocationPermissions.Callback?
     ) {
         if (webChromeClient != null) {
             webChromeClient.onGeolocationPermissionsShowPrompt(origin, callback)
@@ -116,10 +114,41 @@ class TencentWebChromeClientProxy(
         }
     }
 
+    override fun onPermissionRequest(request: PermissionRequest?) {
+        if (webChromeClient != null) {
+            webChromeClient.onPermissionRequest(request)
+        } else {
+            super.onPermissionRequest(request)
+        }
+    }
+
+    override fun onPermissionRequestCanceled(request: PermissionRequest?) {
+        if (webChromeClient != null) {
+            webChromeClient.onPermissionRequestCanceled(request)
+        } else {
+            super.onPermissionRequestCanceled(request)
+        }
+    }
+
+    override fun onConsoleMessage(message: String?, lineNumber: Int, sourceID: String?) {
+        webChromeClientComponent.onConsoleMessage(message, lineNumber, sourceID)
+        if (webChromeClient != null) {
+            webChromeClient.onConsoleMessage(message, lineNumber, sourceID)
+        } else {
+            super.onConsoleMessage(message, lineNumber, sourceID)
+        }
+    }
+
     override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
         webChromeClientComponent.onConsoleMessage(consoleMessage.toComponent())
         return webChromeClient?.onConsoleMessage(consoleMessage)
             ?: super.onConsoleMessage(consoleMessage)
+    }
+
+    fun openFileChooser(uploadMsg: ValueCallback<Uri>, acceptType: String?, capture: String?) {
+        if (spWebViewConfig.needSpFileChoose) {
+            webChromeClientComponent.openFileChooser(uploadMsg.toComponent(), acceptType,capture)
+        }
     }
 
 
@@ -134,33 +163,15 @@ class TencentWebChromeClientProxy(
         if (upLevelResult) {
             return true
         }
-        return if (spWebViewConfig.needSpFileChoose) {
+        return if (spWebViewConfig.needSpFileChoose &&
             webChromeClientComponent.onShowFileChooser(
                 webView,
                 filePathCallback.toComponent(),
-                fileChooserParams.toComponent())
+                fileChooserParams.toComponent())) {
+            true
         } else {
             super.onShowFileChooser(webView, filePathCallback, fileChooserParams)
         }
-    }
-
-    override fun openFileChooser(
-        valueCallback: ValueCallback<Uri>?,
-        acceptType: String?,
-        capture: String?) {
-        if (spWebViewConfig.needSpFileChoose) {
-            webChromeClientComponent.openFileChooser(
-                valueCallback.toComponent(),
-                acceptType,
-                capture)
-        } else {
-            if (webChromeClient != null) {
-                webChromeClient.openFileChooser(valueCallback, acceptType, capture)
-            } else {
-                super.openFileChooser(valueCallback, acceptType, capture)
-            }
-        }
-
     }
 
     override fun onReceivedTouchIconUrl(view: WebView?, url: String?, precomposed: Boolean) {
@@ -317,4 +328,6 @@ class TencentWebChromeClientProxy(
     override fun onJsTimeout(): Boolean {
         return webChromeClient?.onJsTimeout() ?: super.onJsTimeout()
     }
+
+
 }
