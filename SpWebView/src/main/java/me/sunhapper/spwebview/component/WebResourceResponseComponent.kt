@@ -11,5 +11,6 @@ interface WebResourceResponseComponent {
     val statusCode: Int
     val reasonPhrase: String
     var responseHeaders: Map<String, String>?
-    var data: InputStream?
+    var inputStream: InputStream?
+    fun setStatusCodeAndReasonPhrase(statusCode: Int, reasonPhrase: String)
 }

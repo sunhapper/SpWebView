@@ -81,6 +81,9 @@ class SystemWebViewClientProxy(
     }
 
     override fun shouldInterceptRequest(view: WebView, url: String?): WebResourceResponse? {
+        // FIXME: 2021/3/26  测试验证response内容
+        val webResponse=super.shouldInterceptRequest(view, url)
+
         return if (spWebViewConfig.needSpInterceptRequest) {
             webViewClientComponent.shouldInterceptRequest(view, url).toSystem()
                 ?: webViewClient?.shouldInterceptRequest(view, url)

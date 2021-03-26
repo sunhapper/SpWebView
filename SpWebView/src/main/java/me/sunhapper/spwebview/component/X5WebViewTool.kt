@@ -34,16 +34,21 @@ fun WebResourceResponse?.toComponent(): WebResourceResponseComponent? {
 
             override val reasonPhrase: String
                 get() = it.reasonPhrase
+
             override var responseHeaders: Map<String, String>?
                 get() = it.responseHeaders
                 set(value) {
                     it.responseHeaders = value
                 }
-            override var data: InputStream?
+            override var inputStream: InputStream?
                 get() = it.data
                 set(value) {
                     it.data = value
                 }
+
+            override fun setStatusCodeAndReasonPhrase(statusCode: Int, reasonPhrase: String) {
+                it.setStatusCodeAndReasonPhrase(statusCode, reasonPhrase)
+            }
         }
     }
 }
@@ -56,7 +61,7 @@ fun WebResourceResponseComponent?.toX5(): WebResourceResponse? {
             it.statusCode,
             it.reasonPhrase,
             it.responseHeaders,
-            it.data
+            it.inputStream
         )
     }
 }

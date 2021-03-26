@@ -1,5 +1,7 @@
 package me.sunhapper.spwebview.config
 
+import java.io.InputStream
+
 /**
  * Created by sunhapper on 2021/3/23 .
  */
@@ -17,4 +19,8 @@ public class SpWebViewConfig {
     var needSpShowCustomView = true
     var needSpFileChoose = true
     var needPermissionDialog = true
+    var requestInterceptor: (String) -> InputStream? = {
+        null
+    }
+
 }

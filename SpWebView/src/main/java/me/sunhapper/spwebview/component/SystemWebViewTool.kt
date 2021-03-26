@@ -28,21 +28,24 @@ fun WebResourceResponse?.toComponent(): WebResourceResponseComponent? {
                 set(value) {
                     it.encoding = value
                 }
-            override val statusCode: Int
-                get() = it.statusCode
 
-            override val reasonPhrase: String
-                get() = it.reasonPhrase
             override var responseHeaders: Map<String, String>?
                 get() = it.responseHeaders
                 set(value) {
                     it.responseHeaders = value
                 }
-            override var data: InputStream?
+            override var inputStream: InputStream?
                 get() = it.data
                 set(value) {
                     it.data = value
                 }
+            override val statusCode: Int
+                get() = it.statusCode
+            override val reasonPhrase: String
+                get() = it.reasonPhrase
+
+            override fun setStatusCodeAndReasonPhrase(statusCode: Int, reasonPhrase: String) =
+                it.setStatusCodeAndReasonPhrase(statusCode, reasonPhrase)
         }
     }
 }
@@ -55,7 +58,7 @@ fun WebResourceResponseComponent?.toSystem(): WebResourceResponse? {
             it.statusCode,
             it.reasonPhrase,
             it.responseHeaders,
-            it.data
+            it.inputStream
         )
     }
 }
