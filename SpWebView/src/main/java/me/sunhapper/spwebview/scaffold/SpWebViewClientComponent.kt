@@ -57,7 +57,7 @@ class SpWebViewClientComponent<WebView : View>(val spWebViewConfig: SpWebViewCon
     override fun shouldInterceptRequest(
         webView: WebView,
         request: WebResourceRequestComponent?): WebResourceResponseComponent? {
-        TODO("Not yet implemented")
+        return SpRequestInterceptor(spWebViewConfig).interceptRequest(request)
     }
 
     override fun shouldOverrideUrlLoading(view: WebView, url: String?): Boolean {
